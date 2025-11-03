@@ -22,8 +22,8 @@ app.use(
       "http://localhost:5174",
       "ska-bar.netlify.app",
       "https://ska-bar.netlify.app",
-      "https://admin.ska-bar.netlify.app",
-      "admin.ska-bar.com",
+      "https://admin-ska-bar.netlify.app",
+      "admin-ska-bar.com",
     ],
     credentials: true,
   })
