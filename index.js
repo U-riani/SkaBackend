@@ -7,6 +7,9 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminAuthRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+
 
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
@@ -34,6 +37,8 @@ app.use(cookieParser());
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/events", eventRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
