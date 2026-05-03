@@ -1,5 +1,4 @@
 // services/paymentService.unipay.js
-import fetch from "node-fetch";  // or global fetch in Node 18+
 
 export const createUniPayPayment = async (user, event) => {
   const merchantId = process.env.UNIPAY_MERCHANT_ID;
