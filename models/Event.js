@@ -12,6 +12,7 @@ const eventSchema = new mongoose.Schema({
     enum: ["active", "archived"],
     default: "active",
   },
+  capacity: { type: Number, default: 250 },
 });
 
 export default mongoose.model("Event", eventSchema);

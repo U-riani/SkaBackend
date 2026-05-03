@@ -1,6 +1,8 @@
 import Event from "../models/Event.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import { v2 as cloudinary } from "cloudinary";
+import Ticket from "../models/Ticket.js";
+import Invite from "../models/Invite.js";
 
 // CREATE EVENT
 export const createEvent = asyncHandler(async (req, res) => {
@@ -119,4 +121,40 @@ export const getEventById = asyncHandler(async (req, res) => {
     throw new Error("Event not found");
   }
   res.json({ success: true, event });
+});
+
+// 📊 Event statistics for Admin
+export const getEventStats = asyncHandler(async (req, res) => {
+  const events = await Event.find().sort({ date: -1 });
+
+  const stats = await Promise.all(
+    events.map(async (event) => {
+      const [tickets, invites] = await Promise.all([
+        Ticket.find({ event: event._id }),
+        Invite.find({ event: event._id }),
+      ]);
+
+      const totalTickets = tickets.length;
+      const soldTickets = tickets.filter((t) => t.paymentStatus === "paid").length;
+      const usedTickets = tickets.filter((t) => t.used).length;
+
+      const totalInvites = invites.length;
+      const usedInvites = invites.filter((i) => i.used).length;
+
+      return {
+        eventId: event._id,
+        title: event.title,
+        date: event.date,
+        location: event.location,
+        price: event.price,
+        totalTickets,
+        soldTickets,
+        usedTickets,
+        totalInvites,
+        usedInvites,
+      };
+    })
+  );
+
+  res.json({ count: stats.length, stats });
 });

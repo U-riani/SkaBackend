@@ -9,6 +9,10 @@
 # Environment files
 **/.env
 
+
+# Local-only scripts
+**/scripts/createAdmin.js
+
 # Logs
 **/logs/
 *.log

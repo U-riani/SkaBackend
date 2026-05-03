@@ -10,13 +10,15 @@ const userSchema = new mongoose.Schema(
     idNumber: { type: String, required: true },
     imageUrl: { type: String },
     password: { type: String, required: true },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     facebookUrl: { type: String },
     instagramUrl: { type: String },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected", "blocked"],
-      default: "active"
-    }
+      default: "active",
+    },
   },
   { timestamps: true }
 );

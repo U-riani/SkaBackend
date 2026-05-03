@@ -19,7 +19,7 @@ const router = express.Router();
  * ⚠️ TEMPORARY: keep register open for first admin creation.
  * Once your first admin exists, remove or comment this line!
  */
-router.post("/register", registerAdmin);
+// router.post("/register", registerAdmin);
 
 // Public login route
 router.post("/login", loginAdmin);

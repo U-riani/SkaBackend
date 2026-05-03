@@ -59,7 +59,7 @@ export const registerAdmin = asyncHandler(async (req, res) => {
 export const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const admin = await Admin.findOne({ email });
-
+  
   if (admin && (await admin.matchPassword(password))) {
     const token = generateAdminToken(res, admin._id);
     console.log("Generated JWT Token for admin:", token);
@@ -96,3 +96,4 @@ export const getAdminProfile = asyncHandler(async (req, res) => {
   }
   res.status(200).json(admin);
 });
+

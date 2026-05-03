@@ -1,6 +1,8 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { sendResetEmail } from "../services/emailService.js";
 
 /**
  * Helper to generate JWT token
@@ -72,3 +74,45 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 
+// 1. Request reset (send link)
+export const requestPasswordReset = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error("No user found with that email");
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 1000 * 60 * 30; // 30 minutes
+  await user.save();
+
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+  await sendResetEmail(user.email, resetLink);
+
+  res.json({ message: "Reset link sent to your email" });
+});
+
+// 2. Reset password (when clicking link)
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid or expired token");
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({ message: "Password reset successful" });
+});

@@ -7,6 +7,7 @@ import {
   verifyUser,
   getRejectedUsers,
   getBlockedUsers,
+  adminResetUserPassword
 } from "../controllers/userController.js";
 import { uploadWithLogs } from "../middlewares/uploadMiddleware.js";
 import { protectAdmin, adminOnly } from "../middlewares/adminAuthMiddleware.js";
@@ -23,5 +24,6 @@ router.get("/approved", protectAdmin, adminOnly, getApprovedUsers);
 router.patch("/:id/verify", protectAdmin, adminOnly, verifyUser);
 router.get("/rejected", protectAdmin, adminOnly, getRejectedUsers);
 router.get("/blocked", protectAdmin, adminOnly, getBlockedUsers);
+router.patch("/:id/reset-password", protectAdmin, adminOnly, adminResetUserPassword);
 
 export default router;

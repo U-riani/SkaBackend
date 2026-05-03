@@ -9,7 +9,9 @@ import adminAuthRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
-
+import inviteRoutes from "./routes/inviteRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import staffRoutes from "./routes/staffRoutes.js";
 
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
@@ -23,22 +25,30 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "ska-bar.netlify.app",
       "https://ska-bar.netlify.app",
+      "ska-bar.netlify.app",
       "https://admin-ska-bar.netlify.app",
       "admin-ska-bar.com",
     ],
     credentials: true,
   })
 );
+
+
 app.use(express.json());
 app.use(cookieParser());
+
+// ✅ Register raw-body parser BEFORE paymentRoutes
+app.use("/api/payments/unipay/callback", express.json({ verify: (req, res, buf) => (req.rawBody = buf) }));
 
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/invites", inviteRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/staff", staffRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
