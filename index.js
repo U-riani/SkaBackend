@@ -1,3 +1,5 @@
+// server\index.js
+
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -26,20 +28,20 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://ska-bar.netlify.app",
-      "ska-bar.netlify.app",
-      "https://admin-ska-bar.netlify.app",
-      "admin-ska-bar.com",
+      -"https://admin-ska-bar.netlify.app",
     ],
     credentials: true,
-  })
+  }),
 );
-
 
 app.use(express.json());
 app.use(cookieParser());
 
 // ✅ Register raw-body parser BEFORE paymentRoutes
-app.use("/api/payments/unipay/callback", express.json({ verify: (req, res, buf) => (req.rawBody = buf) }));
+app.use(
+  "/api/payments/unipay/callback",
+  express.json({ verify: (req, res, buf) => (req.rawBody = buf) }),
+);
 
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminAuthRoutes);
@@ -54,4 +56,9 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+export default app;
