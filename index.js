@@ -1,4 +1,4 @@
-// server\index.js
+// server/index.js
 
 import express from "express";
 import dotenv from "dotenv";
@@ -18,32 +18,59 @@ import staffRoutes from "./routes/staffRoutes.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://ska-bar.netlify.app",
+  "https://admin-ska-bar.netlify.app",
+];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://ska-bar.netlify.app",
-    "https://admin-ska-bar.netlify.app",
-  ],
+  origin(origin, callback) {
+    console.log("Request origin:", origin);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Ska backend is running",
+  });
+});
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // ✅ Register raw-body parser BEFORE paymentRoutes
 app.use(
   "/api/payments/unipay/callback",
-  express.json({ verify: (req, res, buf) => (req.rawBody = buf) }),
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
 );
 
 app.use("/api/users", userRoutes);
